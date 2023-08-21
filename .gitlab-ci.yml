@@ -1,0 +1,136 @@
+stages:
+  - test
+  - build
+  - plan
+  - deploy
+  - destroy
+
+.terraform:
+  image:
+    name: hashicorp/terraform:1.5.2
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  cache:
+    - key:
+        files:
+          - ./terraform/.terraform.lock.hcl
+      paths:
+        - ./terraform/.terraform
+  before_script:
+    - cd terraform
+  after_script:
+    - cd ..
+
+test:backend:
+  stage: test
+  image: node:18-alpine3.17
+  cache:
+    - key:
+        files:
+          - package-lock.json
+      paths:
+        - node_modules
+  script:
+    - cd backend
+    - npm i
+    - npm run test
+    - cd ..
+
+test:frontend:
+  stage: test
+  image: node:18-alpine3.17
+  cache:
+    - key:
+        files:
+          - package-lock.json
+      paths:
+        - node_modules
+  script:
+    - cd frontend
+    - npm i
+    - npm run test
+    - cd ..
+
+build:backend:
+  stage: build
+  image: node:18-alpine3.17
+  needs:
+    - test:backend
+  cache:
+    - key:
+        files:
+          - package-lock.json
+      paths:
+        - node_modules
+  script:
+    - cd backend
+    - npm i
+    - npm run prepare-lambda
+    - cd ..
+  artifacts:
+    paths:
+      - backend/layer.zip
+      - backend/source.zip
+
+build:frontend:
+  stage: build
+  image: node:18-alpine3.17
+  needs:
+    - test:frontend
+  cache:
+    - key:
+        files:
+          - package-lock.json
+      paths:
+        - node_modules
+  script:
+    - cd frontend
+    - npm i
+    - npm run prepare-next
+    - cd ..
+  artifacts:
+    paths:
+      - frontend/.next-tf
+
+validate:
+  stage: test
+  extends: .terraform
+  script:
+    - terraform init
+    - terraform validate
+
+plan:dev:
+  stage: plan
+  extends: .terraform
+  script:
+    - terraform workspace select dev
+    - terraform plan -var-file=envs/dev.tfvars -out=tf-dev-plan
+  artifacts:
+    paths:
+      - terraform/tf-dev-plan
+
+deploy:dev:
+  stage: deploy
+  extends: .terraform
+  when: manual
+  script:
+    - terraform apply "tf-dev-plan"
+
+plan:destroy:dev:
+  stage: destroy
+  extends: .terraform
+  when: manual
+  script:
+    - terraform workspace select dev
+    - terraform plan -var-file=envs/dev.tfvars -out=tf-destroy-dev-plan -destroy
+  artifacts:
+    paths:
+      - terraform/tf-destroy-dev-plan
+
+destroy:dev:
+  stage: destroy
+  extends: .terraform
+  when: manual
+  script:
+    - terraform apply "tf-destroy-dev-plan"

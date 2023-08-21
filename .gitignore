@@ -1,0 +1,12 @@
+**/node_modules
+**/build
+**/.env
+
+**/source.zip
+**/layer.zip
+
+**/.terraform/*
+
+**/tf-plan
+
+**/.DS_Store
