@@ -1,5 +1,3 @@
-# aws-expressjs-nextjs-template
-
 # Monorepo for ExpressJS Server, Next.js Website, and Terraform Deployment on AWS
 
 This monorepo contains three main components: an ExpressJS backend server (`backend/`), a Next.js frontend website (`frontend/`), and Terraform configurations (`terraform/`) to deploy the entire application stack on AWS. This repository is organized to streamline development, deployment, and maintenance processes.
@@ -34,12 +32,12 @@ Before you begin, ensure you have the following installed:
 ## Backend
 The `backend/` folder contains the ExpressJS server. To start the backend locally:
 1. Navigate to the backend folder: `cd backend`
-2. Run: `npm start`
+2. Run: `npm run dev`
 
 ## Frontend
 The `frontend/` folder contains the Next.js website. To start the frontend locally:
 1. Navigate to the frontend folder: `cd frontend`
-2. Run: `npm start`
+2. Run: `npm run dev`
 
 ## Terraform
 The `terraform/` folder contains Terraform configurations for deploying the application stack on AWS. Customize the configurations in this folder according to your AWS environment.
