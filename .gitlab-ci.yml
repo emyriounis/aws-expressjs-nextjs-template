@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - validate
   - plan
   - deploy
   - destroy
@@ -18,7 +19,10 @@ stages:
       paths:
         - ./terraform/.terraform
   before_script:
+    - apk update && apk upgrade
+    - apk add python3 && apk add bash && apk add curl && apk add aws-cli
     - cd terraform
+    - terraform init
   after_script:
     - cd ..
 
@@ -64,6 +68,8 @@ build:backend:
       paths:
         - node_modules
   script:
+    - apk update && apk upgrade
+    - apk add bash && apk add zip
     - cd backend
     - npm i
     - npm run prepare-lambda
@@ -94,13 +100,19 @@ build:frontend:
       - frontend/.next-tf
 
 validate:
-  stage: test
+  needs:
+    - build:backend
+    - build:frontend
+  stage: validate
   extends: .terraform
   script:
-    - terraform init
     - terraform validate
 
 plan:dev:
+  needs:
+    - build:backend
+    - build:frontend
+    - validate
   stage: plan
   extends: .terraform
   script:
@@ -111,6 +123,10 @@ plan:dev:
       - terraform/tf-dev-plan
 
 deploy:dev:
+  needs:
+    - build:backend
+    - build:frontend
+    - plan:dev
   stage: deploy
   extends: .terraform
   when: manual
@@ -118,6 +134,10 @@ deploy:dev:
     - terraform apply "tf-dev-plan"
 
 plan:destroy:dev:
+  needs:
+    - build:backend
+    - build:frontend
+    - validate
   stage: destroy
   extends: .terraform
   when: manual
@@ -129,6 +149,10 @@ plan:destroy:dev:
       - terraform/tf-destroy-dev-plan
 
 destroy:dev:
+  needs:
+    - build:backend
+    - build:frontend
+    - plan:destroy:dev
   stage: destroy
   extends: .terraform
   when: manual
