@@ -1,13 +1,13 @@
 # Monorepo for ExpressJS Server, Next.js Website, and Terraform Deployment on AWS
 
-This monorepo contains three main components: an ExpressJS backend server (`backend/`), a Next.js frontend website (`frontend/`), and Terraform configurations (`terraform/`) to deploy the entire application stack on AWS. This repository is organized to streamline development, deployment, and maintenance processes.
+This monorepo contains three main components: an ExpressJS expressjs server (`expressjs/`), a Next.js nextjs website (`nextjs/`), and Terraform configurations (`terraform/`) to deploy the entire application stack on AWS. This repository is organized to streamline development, deployment, and maintenance processes.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [Folder Structure](#folder-structure)
-- [Backend](#backend)
-- [Frontend](#frontend)
+- [ExpressJS](#expressjs)
+- [NextJS](#nextjs)
 - [Terraform](#terraform)
 - [Deployment](#deployment)
 - [Known Issues](#known-issues)
@@ -16,27 +16,27 @@ This monorepo contains three main components: an ExpressJS backend server (`back
 
 ## Prerequisites
 Before you begin, ensure you have the following installed:
-- Node.js and npm (for both backend and frontend)
+- Node.js and npm (for both expressjs and nextjs)
 - Terraform (for deployment)
 - AWS CLI configured with appropriate credentials
 
 ## Getting Started
 1. Clone this repository: `git clone https://github.com/emyriounis/aws-expressjs-nextjs-template.git`
 2. Navigate to the repository root: `cd aws-expressjs-nextjs-template`
-3. Install dependencies for backend: `cd backend && npm install`
-4. Install dependencies for frontend: `cd ../frontend && npm install`
+3. Install dependencies for expressjs: `cd expressjs && npm install`
+4. Install dependencies for nextjs: `cd ../nextjs && npm install`
 5. Ensure Terraform is installed and properly configured: [Terraform Installation Guide](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 ## Folder Structure
 
-## Backend
-The `backend/` folder contains the ExpressJS server. To start the backend locally:
-1. Navigate to the backend folder: `cd backend`
+## ExpressJS
+The `expressjs/` folder contains the ExpressJS server. To start the expressjs locally:
+1. Navigate to the expressjs folder: `cd expressjs`
 2. Run: `npm run dev`
 
-## Frontend
-The `frontend/` folder contains the Next.js website. To start the frontend locally:
-1. Navigate to the frontend folder: `cd frontend`
+## NextJS
+The `nextjs/` folder contains the Next.js website. To start the nextjs locally:
+1. Navigate to the nextjs folder: `cd nextjs`
 2. Run: `npm run dev`
 
 ## Terraform
@@ -54,9 +54,8 @@ A list of known issues:
 1. Subdomain has a limit on ammount of characters
 2. NextJS v12 is required for `milliHQ/next-js/aws` tf module to work
 3. Tarraform v4 is required for `milliHQ/next-js/aws` tf module to work
-4. Recommendation: use `yarn` instead of `npm` for `frontend/`
-5. S3 buckets: `Permissions > Object Ownership > ACLs enabled` required for `milliHQ/next-js/aws` tf module to work
-6. `terraform-aws-modules/vpc/aws` v4 is required 
+4. S3 buckets: `Permissions > Object Ownership > ACLs enabled` required for `milliHQ/next-js/aws` tf module to work
+5. `terraform-aws-modules/vpc/aws` v4 is required 
 
 <!-- ## Contributing
 We welcome contributions! To contribute to this repository:

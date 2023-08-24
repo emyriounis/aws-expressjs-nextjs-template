@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "expressjs",
   "version": "0.0.1",
   "description": "express.js server",
   "main": "app.js",

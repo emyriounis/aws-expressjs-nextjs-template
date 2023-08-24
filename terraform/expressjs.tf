@@ -1,8 +1,8 @@
-resource "aws_lambda_layer_version" "backend_layer" {
-  filename   = "../backend/layer.zip"
+resource "aws_lambda_layer_version" "expressjs_layer" {
+  filename   = "../expressjs/layer.zip"
   layer_name = "${local.repo}-layer"
 
-  source_code_hash    = filebase64sha256("../backend/layer.zip")
+  source_code_hash    = filebase64sha256("../expressjs/layer.zip")
   compatible_runtimes = [var.runtime]
 }
 
@@ -10,8 +10,8 @@ module "lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.0.0"
 
-  function_name = "${local.repo}-backend-lambda"
-  description   = "${local.repo} Backend"
+  function_name = "${local.repo}-expressjs-lambda"
+  description   = "${local.repo} ExpressJS"
 
   runtime                      = var.runtime
   memory_size                  = var.lambda_memory_size
@@ -21,11 +21,11 @@ module "lambda" {
   maximum_retry_attempts       = 0
 
   create_package         = false
-  local_existing_package = "../backend/source.zip"
+  local_existing_package = "../expressjs/source.zip"
   handler                = "server.handler"
 
   publish = true
-  layers  = [aws_lambda_layer_version.backend_layer.arn]
+  layers  = [aws_lambda_layer_version.expressjs_layer.arn]
 
   cloudwatch_logs_retention_in_days = var.logs_retention
   # dead_letter_target_arn

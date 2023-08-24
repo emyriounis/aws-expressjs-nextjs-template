@@ -1,5 +1,5 @@
-resource "aws_acm_certificate" "api_domain_cert" {
-  domain_name       = local.api_domain
+resource "aws_acm_certificate" "expressjs_domain_cert" {
+  domain_name       = local.expressjs_domain
   validation_method = "DNS"
 
   lifecycle {
@@ -7,17 +7,17 @@ resource "aws_acm_certificate" "api_domain_cert" {
   }
 }
 
-resource "aws_acm_certificate_validation" "api_domain_cert_validation" {
-  depends_on = [aws_route53_record.api_alias]
+resource "aws_acm_certificate_validation" "expressjs_domain_cert_validation" {
+  depends_on = [aws_route53_record.expressjs_alias]
 
-  certificate_arn         = aws_acm_certificate.api_domain_cert.arn
+  certificate_arn         = aws_acm_certificate.expressjs_domain_cert.arn
 }
 
-resource "aws_route53_record" "api_alias" {
-  depends_on = [aws_acm_certificate.api_domain_cert]
+resource "aws_route53_record" "expressjs_alias" {
+  depends_on = [aws_acm_certificate.expressjs_domain_cert]
 
   zone_id = data.aws_route53_zone.base_domain.zone_id
-  name    = local.api_domain
+  name    = local.expressjs_domain
   type    = "A"
 
   alias {
@@ -27,11 +27,11 @@ resource "aws_route53_record" "api_alias" {
   }
 }
 
-resource "aws_route53_record" "api_domain" {
-  depends_on = [aws_acm_certificate.api_domain_cert]
+resource "aws_route53_record" "expressjs_domain" {
+  depends_on = [aws_acm_certificate.expressjs_domain_cert]
 
   for_each = {
-    for dvo in aws_acm_certificate.api_domain_cert.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.expressjs_domain_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -63,8 +63,8 @@ module "api_gateway" {
 
   create_vpc_link = false
 
-  domain_name                 = local.api_domain
-  domain_name_certificate_arn = aws_acm_certificate.api_domain_cert.arn
+  domain_name                 = local.expressjs_domain
+  domain_name_certificate_arn = aws_acm_certificate.expressjs_domain_cert.arn
 
   default_stage_access_log_destination_arn = module.api_gateway_cloudwatch_log_group.cloudwatch_log_group_arn
   default_stage_access_log_format          = "sourceIp: $context.identity.sourceIp, $context.domainName $context.requestTime \"$context.httpMethod $context.path $context.routeKey $context.protocol\" path: $context.customDomain.basePathMatched resp_status: $context.status integrationLatency: $context.integrationLatency responseLatency: $context.responseLatency requestId: $context.requestId Error: $context.integrationErrorMessage rawRequestPayloadSize: $input.body.size() rawRequestPayload: $input.body" # https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-logging-variables.html

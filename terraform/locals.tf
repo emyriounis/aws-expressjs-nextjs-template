@@ -1,6 +1,9 @@
 locals {
   repo = "${var.name}-${var.enviroment}"
 
-  subdomain  = "${var.enviroment}.${var.name}.${var.base_domain}"
-  api_domain = "api.${local.subdomain}"
+  env_prefix = var.enviroment == "prod" ? "" : "${var.enviroment}."
+  subdomain  = "${local.env_prefix}${var.name}.${var.base_domain}"
+
+  expressjs_domain = "expressjs.${local.subdomain}"
+  nextjs_domain = "nextjs.${local.subdomain}"
 }

@@ -26,7 +26,7 @@ stages:
   after_script:
     - cd ..
 
-test:backend:
+test:expressjs:
   stage: test
   image: node:18-alpine3.17
   cache:
@@ -36,12 +36,12 @@ test:backend:
       paths:
         - node_modules
   script:
-    - cd backend
+    - cd expressjs
     - npm i
     - npm run test
     - cd ..
 
-test:frontend:
+test:nextjs:
   stage: test
   image: node:18-alpine3.17
   cache:
@@ -51,16 +51,16 @@ test:frontend:
       paths:
         - node_modules
   script:
-    - cd frontend
+    - cd nextjs
     - npm i
     - npm run test
     - cd ..
 
-build:backend:
+build:expressjs:
   stage: build
   image: node:18-alpine3.17
   needs:
-    - test:backend
+    - test:expressjs
   cache:
     - key:
         files:
@@ -70,20 +70,20 @@ build:backend:
   script:
     - apk update && apk upgrade
     - apk add bash && apk add zip
-    - cd backend
+    - cd expressjs
     - npm i
     - npm run prepare-lambda
     - cd ..
   artifacts:
     paths:
-      - backend/layer.zip
-      - backend/source.zip
+      - expressjs/layer.zip
+      - expressjs/source.zip
 
-build:frontend:
+build:nextjs:
   stage: build
   image: node:18-alpine3.17
   needs:
-    - test:frontend
+    - test:nextjs
   cache:
     - key:
         files:
@@ -91,18 +91,18 @@ build:frontend:
       paths:
         - node_modules
   script:
-    - cd frontend
+    - cd nextjs
     - npm i
     - npm run prepare-next
     - cd ..
   artifacts:
     paths:
-      - frontend/.next-tf
+      - nextjs/.next-tf
 
 validate:
   needs:
-    - build:backend
-    - build:frontend
+    - build:expressjs
+    - build:nextjs
   stage: validate
   extends: .terraform
   script:
@@ -110,8 +110,8 @@ validate:
 
 plan:dev:
   needs:
-    - build:backend
-    - build:frontend
+    - build:expressjs
+    - build:nextjs
     - validate
   stage: plan
   extends: .terraform
@@ -124,8 +124,8 @@ plan:dev:
 
 deploy:dev:
   needs:
-    - build:backend
-    - build:frontend
+    - build:expressjs
+    - build:nextjs
     - plan:dev
   stage: deploy
   extends: .terraform
@@ -135,8 +135,8 @@ deploy:dev:
 
 plan:destroy:dev:
   needs:
-    - build:backend
-    - build:frontend
+    - build:expressjs
+    - build:nextjs
     - validate
   stage: destroy
   extends: .terraform
@@ -150,8 +150,8 @@ plan:destroy:dev:
 
 destroy:dev:
   needs:
-    - build:backend
-    - build:frontend
+    - build:expressjs
+    - build:nextjs
     - plan:destroy:dev
   stage: destroy
   extends: .terraform
