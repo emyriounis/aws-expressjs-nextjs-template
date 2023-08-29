@@ -10,7 +10,7 @@ resource "aws_acm_certificate" "expressjs_domain_cert" {
 resource "aws_acm_certificate_validation" "expressjs_domain_cert_validation" {
   depends_on = [aws_route53_record.expressjs_alias]
 
-  certificate_arn         = aws_acm_certificate.expressjs_domain_cert.arn
+  certificate_arn = aws_acm_certificate.expressjs_domain_cert.arn
 }
 
 resource "aws_route53_record" "expressjs_alias" {
