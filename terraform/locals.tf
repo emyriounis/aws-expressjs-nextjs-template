@@ -7,4 +7,5 @@ locals {
   expressjs_domain = "expressjs.${local.subdomain}"
   nextjs_domain    = "nextjs.${local.subdomain}"
   reactjs_domain   = "reactjs.${local.subdomain}"
+  vuejs_domain     = "vuejs.${local.subdomain}"
 }

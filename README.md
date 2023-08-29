@@ -48,6 +48,7 @@ To deploy the entire application stack on AWS:
 2. Initialize Terraform: `terraform init`
 3. Review and modify the `main.tf` and other configuration files as needed.
 4. Deploy the infrastructure: `terraform apply`
+5. Visualize the infrastructure: `terraform graph -type=plan | dot -Tpng > graph.png`
 
 ## Known Issues
 A list of known issues:
