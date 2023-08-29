@@ -10,3 +10,5 @@
 **/tf-plan
 
 **/.DS_Store
+
+**/visualize/tf-graph.*

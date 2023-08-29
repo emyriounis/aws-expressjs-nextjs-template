@@ -71,6 +71,21 @@ test:reactjs:
     - npm run test
     - cd ..
 
+test:vuejs:
+  stage: test
+  image: node:18-alpine3.17
+  cache:
+    - key:
+        files:
+          - vuejs/package-lock.json
+      paths:
+        - vuejs/node_modules
+  script:
+    - cd vuejs
+    - npm i
+    - npm run test
+    - cd ..
+
 build:expressjs:
   stage: build
   image: node:18-alpine3.17
@@ -134,21 +149,57 @@ build:reactjs:
     paths:
       - reactjs/build
 
+build:vuejs:
+  stage: build
+  image: node:18-alpine3.17
+  needs:
+    - test:vuejs
+  cache:
+    - key:
+        files:
+          - vuejs/package-lock.json
+      paths:
+        - vuejs/node_modules
+  script:
+    - cd vuejs
+    - npm i
+    - npm run build
+    - cd ..
+  artifacts:
+    paths:
+      - vuejs/build
+
 validate:
   needs:
     - build:expressjs
     - build:nextjs
     - build:reactjs
+    - build:vuejs
   stage: validate
   extends: .terraform
   script:
     - terraform validate
+
+visualize:
+  needs:
+    - validate
+  stage: plan
+  extends: .terraform
+  script:
+    - apk add graphviz
+    - cd visualize
+    - bash gen-visual.sh
+    - cd ..
+  artifacts:
+    paths:
+      - terraform/visualize
 
 plan:dev:
   needs:
     - build:expressjs
     - build:nextjs
     - build:reactjs
+    - build:vuejs
     - validate
   stage: plan
   extends: .terraform
@@ -164,6 +215,7 @@ deploy:dev:
     - build:expressjs
     - build:nextjs
     - build:reactjs
+    - build:vuejs
     - plan:dev
   stage: deploy
   extends: .terraform
@@ -176,6 +228,7 @@ plan:destroy:dev:
     - build:expressjs
     - build:nextjs
     - build:reactjs
+    - build:vuejs
     - validate
   stage: destroy
   extends: .terraform
@@ -192,6 +245,7 @@ destroy:dev:
     - build:expressjs
     - build:nextjs
     - build:reactjs
+    - build:vuejs
     - plan:destroy:dev
   stage: destroy
   extends: .terraform
