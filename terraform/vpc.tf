@@ -3,7 +3,7 @@ module "vpc" {
   version = "4.0.2"
 
   name = "${local.repo}-vpc"
-  cidr = "10.0.0.0/16"
+  cidr = var.cidr
 
   azs              = var.azs
   public_subnets   = var.public_subnets

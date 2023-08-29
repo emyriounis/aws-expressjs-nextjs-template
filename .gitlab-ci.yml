@@ -32,9 +32,9 @@ test:expressjs:
   cache:
     - key:
         files:
-          - package-lock.json
+          - expressjs/package-lock.json
       paths:
-        - node_modules
+        - expressjs/node_modules
   script:
     - cd expressjs
     - npm i
@@ -47,11 +47,26 @@ test:nextjs:
   cache:
     - key:
         files:
-          - package-lock.json
+          - nextjs/package-lock.json
       paths:
-        - node_modules
+        - nextjs/node_modules
   script:
     - cd nextjs
+    - npm i
+    - npm run test
+    - cd ..
+
+test:reactjs:
+  stage: test
+  image: node:18-alpine3.17
+  cache:
+    - key:
+        files:
+          - reactjs/package-lock.json
+      paths:
+        - reactjs/node_modules
+  script:
+    - cd reactjs
     - npm i
     - npm run test
     - cd ..
@@ -64,9 +79,9 @@ build:expressjs:
   cache:
     - key:
         files:
-          - package-lock.json
+          - expressjs/package-lock.json
       paths:
-        - node_modules
+        - expressjs/node_modules
   script:
     - apk update && apk upgrade
     - apk add bash && apk add zip
@@ -87,9 +102,9 @@ build:nextjs:
   cache:
     - key:
         files:
-          - package-lock.json
+          - nextjs/package-lock.json
       paths:
-        - node_modules
+        - nextjs/node_modules
   script:
     - cd nextjs
     - npm i
@@ -99,10 +114,31 @@ build:nextjs:
     paths:
       - nextjs/.next-tf
 
+build:reactjs:
+  stage: build
+  image: node:18-alpine3.17
+  needs:
+    - test:reactjs
+  cache:
+    - key:
+        files:
+          - reactjs/package-lock.json
+      paths:
+        - reactjs/node_modules
+  script:
+    - cd reactjs
+    - npm i
+    - CI=false npm run build
+    - cd ..
+  artifacts:
+    paths:
+      - reactjs/build
+
 validate:
   needs:
     - build:expressjs
     - build:nextjs
+    - build:reactjs
   stage: validate
   extends: .terraform
   script:
@@ -112,6 +148,7 @@ plan:dev:
   needs:
     - build:expressjs
     - build:nextjs
+    - build:reactjs
     - validate
   stage: plan
   extends: .terraform
@@ -126,6 +163,7 @@ deploy:dev:
   needs:
     - build:expressjs
     - build:nextjs
+    - build:reactjs
     - plan:dev
   stage: deploy
   extends: .terraform
@@ -137,6 +175,7 @@ plan:destroy:dev:
   needs:
     - build:expressjs
     - build:nextjs
+    - build:reactjs
     - validate
   stage: destroy
   extends: .terraform
@@ -152,6 +191,7 @@ destroy:dev:
   needs:
     - build:expressjs
     - build:nextjs
+    - build:reactjs
     - plan:destroy:dev
   stage: destroy
   extends: .terraform
