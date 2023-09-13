@@ -6,6 +6,7 @@
 **/layer.zip
 
 **/.terraform/*
+**/tf-graph/*
 
 **/tf-plan
 
