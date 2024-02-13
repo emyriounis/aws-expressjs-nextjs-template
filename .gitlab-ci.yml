@@ -41,17 +41,32 @@ test:expressjs:
     - npm run test
     - cd ..
 
-test:nextjs:
+test:nextjs-v12:
   stage: test
   image: node:18-alpine3.17
   cache:
     - key:
         files:
-          - nextjs/package-lock.json
+          - nextjs-v12/package-lock.json
       paths:
-        - nextjs/node_modules
+        - nextjs-v12/node_modules
   script:
-    - cd nextjs
+    - cd nextjs-v12
+    - npm i
+    - npm run test
+    - cd ..
+
+test:nextjs-v14-static:
+  stage: test
+  image: node:18-alpine3.17
+  cache:
+    - key:
+        files:
+          - nextjs-v14-static/package-lock.json
+      paths:
+        - nextjs-v14-static/node_modules
+  script:
+    - cd nextjs-v14-static
     - npm i
     - npm run test
     - cd ..
@@ -109,25 +124,45 @@ build:expressjs:
       - expressjs/layer.zip
       - expressjs/source.zip
 
-build:nextjs:
+build:nextjs-v12:
   stage: build
   image: node:18-alpine3.17
   needs:
-    - test:nextjs
+    - test:nextjs-v12
   cache:
     - key:
         files:
-          - nextjs/package-lock.json
+          - nextjs-v12/package-lock.json
       paths:
-        - nextjs/node_modules
+        - nextjs-v12/node_modules
   script:
-    - cd nextjs
+    - cd nextjs-v12
     - npm i
     - npm run prepare-next
     - cd ..
   artifacts:
     paths:
-      - nextjs/.next-tf
+      - nextjs-v12/.next-tf
+
+build:nextjs-v14-static:
+  stage: build
+  image: node:18-alpine3.17
+  needs:
+    - test:next-v14-static
+  cache:
+    - key:
+        files:
+          - next-v14-static/package-lock.json
+      paths:
+        - next-v14-static/node_modules
+  script:
+    - cd next-v14-static
+    - npm i
+    - npm run build
+    - cd ..
+  artifacts:
+    paths:
+      - next-v14-static/build
 
 build:reactjs:
   stage: build
@@ -172,7 +207,8 @@ build:vuejs:
 validate:
   needs:
     - build:expressjs
-    - build:nextjs
+    - build:nextjs-v12
+    - build:nextjs-v14-static
     - build:reactjs
     - build:vuejs
   stage: validate
@@ -197,7 +233,8 @@ visualize:
 plan:dev:
   needs:
     - build:expressjs
-    - build:nextjs
+    - build:nextjs-v12
+    - build:nextjs-v14-static
     - build:reactjs
     - build:vuejs
     - validate
@@ -213,7 +250,8 @@ plan:dev:
 deploy:dev:
   needs:
     - build:expressjs
-    - build:nextjs
+    - build:nextjs-v12
+    - build:nextjs-v14-static
     - build:reactjs
     - build:vuejs
     - plan:dev
@@ -226,7 +264,8 @@ deploy:dev:
 plan:destroy:dev:
   needs:
     - build:expressjs
-    - build:nextjs
+    - build:nextjs-v12
+    - build:nextjs-v14-static
     - build:reactjs
     - build:vuejs
     - validate
@@ -243,7 +282,8 @@ plan:destroy:dev:
 destroy:dev:
   needs:
     - build:expressjs
-    - build:nextjs
+    - build:nextjs-v12
+    - build:nextjs-v14-static
     - build:reactjs
     - build:vuejs
     - plan:destroy:dev

@@ -1,0 +1,1 @@
+Use the [Zero-Config Terraform Module to deploy Next.js Apps on AWS using Serverless solutions](https://github.com/Nexode-Consulting/terraform-aws-nextjs-serverless)
