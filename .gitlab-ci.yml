@@ -142,7 +142,7 @@ build:nextjs-v12:
     - cd ..
   artifacts:
     paths:
-      - nextjs-v12/.nextjs-tf
+      - nextjs-v12/.next-tf
 
 build:nextjs-v14-static:
   stage: build
