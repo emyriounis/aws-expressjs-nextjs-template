@@ -221,6 +221,7 @@ visualize:
     - validate
   stage: plan
   extends: .terraform
+  when: manual
   script:
     - apk add graphviz
     - cd visualize
