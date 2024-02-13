@@ -1,8 +1,8 @@
-module "nextjs_v14_static_bucket" {
+module "nextjs_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "3.15.1"
 
-  bucket                   = "${local.repo}-nextjs_v14_static"
+  bucket                   = "${local.repo}-nextjs"
   object_ownership         = "ObjectWriter"
   acl                      = "private"
   force_destroy            = true
@@ -14,16 +14,16 @@ module "nextjs_v14_static_bucket" {
   restrict_public_buckets = true
 }
 
-module "nextjs_v14_static_static_files" {
+module "nextjs_static_files" {
   source  = "hashicorp/dir/template"
   version = "1.0.2"
 
-  base_dir = "../nextjs_v14_static/build"
+  base_dir = "../nextjs-v14-static/build"
 }
 
-resource "aws_s3_object" "nextjs_v14_static_files" {
-  bucket   = module.nextjs_v14_static_bucket.s3_bucket_id
-  for_each = module.nextjs_v14_static_static_files.files
+resource "aws_s3_object" "nextjs_files" {
+  bucket   = module.nextjs_bucket.s3_bucket_id
+  for_each = module.nextjs_static_files.files
 
   key          = each.key
   source       = each.value.source_path
@@ -32,28 +32,28 @@ resource "aws_s3_object" "nextjs_v14_static_files" {
   etag         = each.value.digests.md5
 }
 
-resource "aws_cloudfront_origin_access_identity" "nextjs_v14_static_oai" {}
+resource "aws_cloudfront_origin_access_identity" "nextjs_oai" {}
 
-resource "aws_cloudfront_distribution" "nextjs_v14_static_distribution" {
+resource "aws_cloudfront_distribution" "nextjs_distribution" {
   origin {
-    domain_name = module.nextjs_v14_static_bucket.s3_bucket_bucket_regional_domain_name
-    origin_id   = aws_cloudfront_origin_access_identity.nextjs_v14_static_oai.id
+    domain_name = module.nextjs_bucket.s3_bucket_bucket_regional_domain_name
+    origin_id   = aws_cloudfront_origin_access_identity.nextjs_oai.id
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.nextjs_v14_static_oai.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.nextjs_oai.cloudfront_access_identity_path
     }
   }
 
   enabled         = true
   is_ipv6_enabled = true
 
-  aliases             = [local.nextjs_v14_static_domain]
+  aliases             = [local.nextjs_domain]
   default_root_object = "index.html"
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = aws_cloudfront_origin_access_identity.nextjs_v14_static_oai.id
+    target_origin_id = aws_cloudfront_origin_access_identity.nextjs_oai.id
 
     forwarded_values {
       query_string = true
@@ -74,7 +74,7 @@ resource "aws_cloudfront_distribution" "nextjs_v14_static_distribution" {
     path_pattern     = "/index.html"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = aws_cloudfront_origin_access_identity.nextjs_v14_static_oai.id
+    target_origin_id = aws_cloudfront_origin_access_identity.nextjs_oai.id
 
     forwarded_values {
       query_string = true
@@ -94,7 +94,7 @@ resource "aws_cloudfront_distribution" "nextjs_v14_static_distribution" {
   price_class = "PriceClass_100"
 
   viewer_certificate {
-    acm_certificate_arn      = module.nextjs_v14_static_cloudfront_certificate.acm_certificate_arn
+    acm_certificate_arn      = module.nextjs_cloudfront_certificate.acm_certificate_arn
     minimum_protocol_version = "TLSv1.2_2021"
     ssl_support_method       = "sni-only"
   }
@@ -120,28 +120,28 @@ resource "aws_cloudfront_distribution" "nextjs_v14_static_distribution" {
   }
 }
 
-data "aws_iam_policy_document" "nextjs_v14_static_s3_policy" {
+data "aws_iam_policy_document" "nextjs_s3_policy" {
   statement {
     actions   = ["s3:GetObject"]
-    resources = ["${module.nextjs_v14_static_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.nextjs_bucket.s3_bucket_arn}/*"]
 
     principals {
       type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.nextjs_v14_static_oai.iam_arn]
+      identifiers = [aws_cloudfront_origin_access_identity.nextjs_oai.iam_arn]
     }
   }
 }
 
-resource "aws_s3_bucket_policy" "nextjs_v14_static_bucket_policy" {
-  bucket = module.nextjs_v14_static_bucket.s3_bucket_id
-  policy = data.aws_iam_policy_document.nextjs_v14_static_s3_policy.json
+resource "aws_s3_bucket_policy" "nextjs_bucket_policy" {
+  bucket = module.nextjs_bucket.s3_bucket_id
+  policy = data.aws_iam_policy_document.nextjs_s3_policy.json
 }
 
-module "nextjs_v14_static_cloudfront_certificate" {
+module "nextjs_cloudfront_certificate" {
   source  = "terraform-aws-modules/acm/aws"
   version = "4.3.2"
 
-  domain_name = local.nextjs_v14_static_domain
+  domain_name = local.nextjs_domain
   zone_id     = data.aws_route53_zone.base_domain.zone_id
 
   providers = {
@@ -149,11 +149,11 @@ module "nextjs_v14_static_cloudfront_certificate" {
   }
 }
 
-resource "aws_route53_record" "nextjs_v14_static_domain" {
-  depends_on = [module.nextjs_v14_static_cloudfront_certificate]
+resource "aws_route53_record" "nextjs_domain" {
+  depends_on = [module.nextjs_cloudfront_certificate]
 
   for_each = {
-    for dvo in module.nextjs_v14_static_cloudfront_certificate.acm_certificate_domain_validation_options : dvo.domain_name => {
+    for dvo in module.nextjs_cloudfront_certificate.acm_certificate_domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -168,16 +168,16 @@ resource "aws_route53_record" "nextjs_v14_static_domain" {
   zone_id         = data.aws_route53_zone.base_domain.zone_id
 }
 
-resource "aws_route53_record" "nextjs_v14_static_alias" {
+resource "aws_route53_record" "nextjs_alias" {
   zone_id = data.aws_route53_zone.base_domain.zone_id
-  name    = local.nextjs_v14_static_domain
+  name    = local.nextjs_domain
   type    = "A"
 
   allow_overwrite = true
 
   alias {
-    name                   = aws_cloudfront_distribution.nextjs_v14_static_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.nextjs_v14_static_distribution.hosted_zone_id
+    name                   = aws_cloudfront_distribution.nextjs_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.nextjs_distribution.hosted_zone_id
     evaluate_target_health = false
   }
 }
