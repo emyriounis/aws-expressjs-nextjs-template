@@ -142,27 +142,27 @@ build:nextjs-v12:
     - cd ..
   artifacts:
     paths:
-      - nextjs-v12/.next-tf
+      - nextjs-v12/.nextjs-tf
 
 build:nextjs-v14-static:
   stage: build
   image: node:18-alpine3.17
   needs:
-    - test:next-v14-static
+    - test:nextjs-v14-static
   cache:
     - key:
         files:
-          - next-v14-static/package-lock.json
+          - nextjs-v14-static/package-lock.json
       paths:
-        - next-v14-static/node_modules
+        - nextjs-v14-static/node_modules
   script:
-    - cd next-v14-static
+    - cd nextjs-v14-static
     - npm i
     - npm run build
     - cd ..
   artifacts:
     paths:
-      - next-v14-static/build
+      - nextjs-v14-static/build
 
 build:reactjs:
   stage: build
