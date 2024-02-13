@@ -6,8 +6,8 @@ resource "aws_route53_record" "cloudfront_alias_domain" {
   type    = "A"
 
   alias {
-    name                   = module.nextjs_v12_next.cloudfront_domain_name
-    zone_id                = module.nextjs_v12_next.cloudfront_hosted_zone_id
+    name                   = module.nextjs_v12.cloudfront_domain_name
+    zone_id                = module.nextjs_v12.cloudfront_hosted_zone_id
     evaluate_target_health = true
   }
 }
@@ -43,7 +43,7 @@ module "nextjs_v12_cloudfront_certificate" {
   }
 }
 
-module "nextjs_v12_next" {
+module "nextjs_v12" {
   source  = "milliHQ/next-js/aws"
   version = "0.13.2"
 
@@ -52,7 +52,7 @@ module "nextjs_v12_next" {
   }
 
   deployment_name = local.repo
-  next_tf_dir     = "../nextjs_v12/.next-tf"
+  next_tf_dir     = "../nextjs-v12/.next-tf"
 
   cloudfront_aliases             = [local.nextjs_v12_domain]
   cloudfront_acm_certificate_arn = module.nextjs_v12_cloudfront_certificate.acm_certificate_arn
