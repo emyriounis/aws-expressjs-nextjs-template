@@ -1,0 +1,145 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ['main']
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  test-expressjs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: expressjs/package-lock.json
+      - run: |
+          cd expressjs
+          npm ci
+          npm run test
+
+  test-nextjs-v14-static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: nextjs-v14-static/package-lock.json
+      - run: |
+          cd nextjs-v14-static
+          npm ci
+          npm run test
+
+  test-reactjs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: reactjs/package-lock.json
+      - run: |
+          cd reactjs
+          npm ci
+          npm run test
+
+  build-expressjs:
+    needs: test-expressjs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: expressjs/package-lock.json
+      - name: Install Zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+      - run: |
+          cd expressjs
+          npm ci
+          npm run prepare-lambda
+      - uses: actions/upload-artifact@v4
+        with:
+          name: expressjs-artifacts
+          path: |
+            expressjs/layer.zip
+            expressjs/source.zip
+
+  build-nextjs-v14-static:
+    needs: test-nextjs-v14-static
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: nextjs-v14-static/package-lock.json
+      - run: |
+          cd nextjs-v14-static
+          npm ci
+          npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-v14-static-artifacts
+          path: nextjs-v14-static/build
+
+  build-reactjs:
+    needs: test-reactjs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: reactjs/package-lock.json
+      - run: |
+          cd reactjs
+          npm ci
+          CI=false npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reactjs-artifacts
+          path: reactjs/build
+
+  deploy-dev:
+    needs:
+      - build-expressjs
+      - build-nextjs-v14-static
+      - build-reactjs
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.2
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: expressjs-artifacts
+          path: expressjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: nextjs-v14-static-artifacts
+          path: nextjs-v14-static/build
+      - uses: actions/download-artifact@v4
+        with:
+          name: reactjs-artifacts
+          path: reactjs/build
+
+      - run: |
+          cd terraform
+          terraform init
+          terraform workspace select dev || terraform workspace new dev
+          terraform apply -var-file=envs/dev.tfvars -auto-approve
