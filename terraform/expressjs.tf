@@ -8,7 +8,7 @@ resource "aws_lambda_layer_version" "expressjs_layer" {
 
 module "lambda" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.0.0"
+  version = "8.7.0"
 
   function_name = "${local.repo}-expressjs-lambda"
   description   = "${local.repo} ExpressJS"
@@ -48,7 +48,7 @@ module "lambda" {
     api_gateway = {
       action     = "lambda:InvokeFunction"
       service    = "apigateway"
-      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 

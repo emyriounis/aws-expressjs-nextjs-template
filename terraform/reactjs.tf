@@ -1,6 +1,6 @@
 module "reactjs_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "3.15.1"
+  version = "5.11.0"
 
   bucket                   = "${local.repo}-reactjs"
   object_ownership         = "ObjectWriter"
@@ -139,10 +139,13 @@ resource "aws_s3_bucket_policy" "reactjs_bucket_policy" {
 
 module "reactjs_cloudfront_certificate" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "4.3.2"
+  version = "6.3.0"
 
   domain_name = local.reactjs_domain
   zone_id     = data.aws_route53_zone.base_domain.zone_id
+
+  validation_method   = "DNS"
+  wait_for_validation = false
 
   providers = {
     aws = aws.global_region
@@ -150,8 +153,6 @@ module "reactjs_cloudfront_certificate" {
 }
 
 resource "aws_route53_record" "reactjs_domain" {
-  depends_on = [module.reactjs_cloudfront_certificate]
-
   for_each = {
     for dvo in module.reactjs_cloudfront_certificate.acm_certificate_domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name

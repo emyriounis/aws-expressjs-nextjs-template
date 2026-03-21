@@ -243,7 +243,7 @@ plan:dev:
   extends: .terraform
   script:
     - terraform workspace select dev
-    - terraform plan -var-file=envs/dev.tfvars -out=tf-dev-plan
+    - terraform plan -var-file=config/dev.tfvars -out=tf-dev-plan
   artifacts:
     paths:
       - terraform/tf-dev-plan
@@ -275,7 +275,7 @@ plan:destroy:dev:
   when: manual
   script:
     - terraform workspace select dev
-    - terraform plan -var-file=envs/dev.tfvars -out=tf-destroy-dev-plan -destroy
+    - terraform plan -var-file=config/dev.tfvars -out=tf-destroy-dev-plan -destroy
   artifacts:
     paths:
       - terraform/tf-destroy-dev-plan

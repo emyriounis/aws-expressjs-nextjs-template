@@ -126,7 +126,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: 1.5.2
+          terraform_version: 1.11.1
 
       - name: Download Artifacts - expressjs
         uses: actions/download-artifact@v7
@@ -152,4 +152,4 @@ jobs:
         run: |
           cd terraform
           terraform init
-          terraform apply -auto-approve -var-file=envs/dev.tfvars
+          terraform apply -auto-approve -var-file=config/dev.tfvars

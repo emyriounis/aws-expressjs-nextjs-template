@@ -11,14 +11,14 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "4.67.0"
+      version = "6.37.0"
     }
   }
 
   backend "s3" {
-    bucket  = "prytanis-terraform-state"
+    bucket  = "myriounis-terraform-state"
     key     = "aws-expressjs-nextjs-template/terraform.tfstate"
-    region  = "eu-west-1"
+    region  = "eu-central-1"
     encrypt = true
   }
 }
