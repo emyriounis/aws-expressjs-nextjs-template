@@ -30,9 +30,10 @@ module "lambda" {
   cloudwatch_logs_retention_in_days = var.logs_retention
   # dead_letter_target_arn
 
-  attach_network_policy  = true
-  vpc_subnet_ids         = module.vpc.private_subnets
-  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  attach_network_policy = false
+  # attach_network_policy  = true
+  # vpc_subnet_ids         = module.vpc.private_subnets
+  # vpc_security_group_ids = [module.vpc.default_security_group_id]
 
   cors = {
     allow_credentials = true
