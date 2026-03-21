@@ -13,17 +13,18 @@ module "api_gateway" {
     log_group_retention_in_days = var.logs_retention
     format = jsonencode({
       context = {
-        domainName              = "$context.domainName"
-        integrationErrorMessage = "$context.integrationErrorMessage"
-        protocol                = "$context.protocol"
-        requestId               = "$context.requestId"
-        requestTime             = "$context.requestTime"
-        httpMethod              = "$context.httpMethod"
-        path                    = "$context.path"
-        responseLength          = "$context.responseLength"
-        routeKey                = "$context.routeKey"
-        stage                   = "$context.stage"
-        status                  = "$context.status"
+        domainName     = "$context.domainName"
+        domainPrefix   = "$context.domainPrefix"
+        protocol       = "$context.protocol"
+        requestId      = "$context.requestId"
+        resourcePath   = "$context.resourcePath"
+        requestTime    = "$context.requestTime"
+        httpMethod     = "$context.httpMethod"
+        path           = "$context.path"
+        responseLength = "$context.responseLength"
+        routeKey       = "$context.routeKey"
+        stage          = "$context.stage"
+        status         = "$context.status"
         error = {
           message      = "$context.error.message"
           responseType = "$context.error.responseType"
@@ -32,10 +33,11 @@ module "api_gateway" {
           sourceIP = "$context.identity.sourceIp"
         }
         integration = {
-          error              = "$context.integration.error"
-          integrationStatus  = "$context.integration.integrationStatus"
-          integrationLatency = "$context.integrationLatency"
-          responseLatency    = "$context.responseLatency"
+          error                   = "$context.integration.error"
+          integrationStatus       = "$context.integration.integrationStatus"
+          integrationLatency      = "$context.integrationLatency"
+          responseLatency         = "$context.responseLatency"
+          integrationErrorMessage = "$context.integrationErrorMessage"
         }
       }
     })
