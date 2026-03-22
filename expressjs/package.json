@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/local-server.ts",
     "test": "jest --runInBand --forceExit --detectOpenHandles",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "prepare-lambda": "bash scripts/prepare-lambda.sh"
   },
   "author": "",

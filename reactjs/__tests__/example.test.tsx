@@ -6,7 +6,7 @@ describe('example', () => {
     render(<App />)
 
     const text = screen.getByText(/React/)
-    
+
     expect(text).toBeInTheDocument()
   })
 })
