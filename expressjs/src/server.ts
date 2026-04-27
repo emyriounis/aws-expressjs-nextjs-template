@@ -3,15 +3,7 @@ import app from './app'
 
 let serverlessExpressInstance: any
 
-// function asyncTask() {
-//   return new Promise((resolve) => {
-//     setTimeout(() => resolve('connected to database'), 1000)
-//   })
-// }
-
 const setup = async (event: any, context: any) => {
-  // const asyncValue = await asyncTask()
-  // console.log(asyncValue)
   serverlessExpressInstance = serverlessExpress({ app })
   return serverlessExpressInstance(event, context)
 }

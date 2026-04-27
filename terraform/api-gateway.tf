@@ -49,8 +49,32 @@ module "api_gateway" {
     allow_methods = ["*"]
   }
 
+  authorizers = {
+    "cognito" = {
+      authorizer_type  = "JWT"
+      identity_sources = ["$request.header.Authorization"]
+      name             = "cognito-authorizer"
+      jwt_configuration = {
+        audience = [aws_cognito_user_pool_client.this.id]
+        issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
+      }
+    }
+  }
+
   routes = {
+    "ANY /heartbeat" = {
+      authorization_type = "NONE"
+
+      integration = {
+        uri                    = module.lambda.lambda_function_arn
+        payload_format_version = "2.0"
+      }
+    }
+
     "$default" = {
+      authorization_type = "JWT"
+      authorizer_key     = "cognito"
+
       integration = {
         uri                    = module.lambda.lambda_function_arn
         payload_format_version = "2.0"
