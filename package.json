@@ -1,0 +1,12 @@
+{
+  "name": "aws-expressjs-nextjs-template",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root project for formatting and linting",
+  "scripts": {
+    "format": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md,yml,yaml}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
+  }
+}

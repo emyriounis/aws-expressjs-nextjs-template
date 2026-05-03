@@ -23,20 +23,6 @@ jobs:
           npm ci
           npm run test
 
-  test-nextjs-v14-static:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: 'npm'
-          cache-dependency-path: nextjs-v14-static/package-lock.json
-      - run: |
-          cd nextjs-v14-static
-          npm ci
-          npm run test
-
   test-reactjs:
     runs-on: ubuntu-latest
     steps:
@@ -73,24 +59,6 @@ jobs:
             expressjs/layer.zip
             expressjs/source.zip
 
-  build-nextjs-v14-static:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: 'npm'
-          cache-dependency-path: nextjs-v14-static/package-lock.json
-      - run: |
-          cd nextjs-v14-static
-          npm ci
-          npm run build
-      - uses: actions/upload-artifact@v6
-        with:
-          name: nextjs-v14-static-artifacts
-          path: nextjs-v14-static/build
-
   build-reactjs:
     runs-on: ubuntu-latest
     steps:
@@ -112,10 +80,8 @@ jobs:
   deploy-dev:
     needs:
       - test-expressjs
-      - test-nextjs-v14-static
       - test-reactjs
       - build-expressjs
-      - build-nextjs-v14-static
       - build-reactjs
     runs-on: ubuntu-latest
     environment: dev
@@ -133,12 +99,6 @@ jobs:
         with:
           name: expressjs-artifacts
           path: expressjs
-
-      - name: Download Artifacts - nextjs-v14-static
-        uses: actions/download-artifact@v7
-        with:
-          name: nextjs-v14-static-artifacts
-          path: nextjs-v14-static/build
 
       - name: Download Artifacts - reactjs
         uses: actions/download-artifact@v7
