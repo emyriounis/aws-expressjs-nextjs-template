@@ -2,8 +2,8 @@ module "api_gateway" {
   source  = "terraform-aws-modules/apigateway-v2/aws"
   version = "6.1.0"
 
-  name        = "${local.repo}-api"
-  description = "${local.repo} API"
+  name        = "${local.resource_prefix}-api"
+  description = "${local.resource_prefix} API"
 
   hosted_zone_name = var.base_domain
   domain_name      = local.expressjs_domain

@@ -2,7 +2,7 @@ module "reactjs_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "5.11.0"
 
-  bucket                   = "${local.repo}-reactjs"
+  bucket                   = "${local.resource_prefix}-reactjs"
   object_ownership         = "ObjectWriter"
   acl                      = "private"
   force_destroy            = true
@@ -18,7 +18,7 @@ module "reactjs_static_files" {
   source  = "hashicorp/dir/template"
   version = "1.0.2"
 
-  base_dir = "../reactjs/build"
+  base_dir = "../build"
 }
 
 resource "aws_s3_object" "reactjs_files" {

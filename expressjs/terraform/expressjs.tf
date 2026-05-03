@@ -1,8 +1,8 @@
 resource "aws_lambda_layer_version" "expressjs_layer" {
-  filename   = "../expressjs/layer.zip"
-  layer_name = "${local.repo}-layer"
+  filename   = "../layer.zip"
+  layer_name = "${local.resource_prefix}-layer"
 
-  source_code_hash    = filebase64sha256("../expressjs/layer.zip")
+  source_code_hash    = filebase64sha256("../layer.zip")
   compatible_runtimes = [var.runtime]
 }
 
@@ -10,8 +10,8 @@ module "lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.7.0"
 
-  function_name = "${local.repo}-expressjs-lambda"
-  description   = "${local.repo} ExpressJS"
+  function_name = "${local.resource_prefix}-expressjs-lambda"
+  description   = "${local.resource_prefix} ExpressJS"
 
   runtime                      = var.runtime
   memory_size                  = var.lambda_memory_size
@@ -21,7 +21,7 @@ module "lambda" {
   maximum_retry_attempts       = 0
 
   create_package         = false
-  local_existing_package = "../expressjs/source.zip"
+  local_existing_package = "../source.zip"
   handler                = "server.handler"
 
   publish = true

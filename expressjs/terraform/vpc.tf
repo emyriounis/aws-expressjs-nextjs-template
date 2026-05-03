@@ -2,7 +2,7 @@
 #   source  = "terraform-aws-modules/vpc/aws"
 #   version = "6.6.0"
 
-#   name = "${local.repo}-vpc"
+#   name = "${local.resource_prefix}-vpc"
 #   cidr = var.cidr
 
 #   azs              = var.azs
@@ -23,5 +23,5 @@
 #   create_database_subnet_group           = false
 #   create_database_subnet_route_table     = false
 #   create_database_internet_gateway_route = false
-#   database_subnet_group_name             = "${local.repo}-db-subnet"
+#   database_subnet_group_name             = "${local.resource_prefix}-db-subnet"
 # }

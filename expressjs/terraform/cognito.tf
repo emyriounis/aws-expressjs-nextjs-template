@@ -1,7 +1,7 @@
 data "aws_region" "current" {}
 
 resource "aws_cognito_user_pool" "this" {
-  name           = "${local.repo}-pool"
+  name           = "${local.resource_prefix}-pool"
   user_pool_tier = "ESSENTIALS"
 
   alias_attributes    = ["email", "phone_number"]
@@ -17,7 +17,7 @@ resource "aws_cognito_user_pool" "this" {
 }
 
 resource "aws_cognito_user_pool_client" "this" {
-  name         = "${local.repo}-client"
+  name         = "${local.resource_prefix}-client"
   user_pool_id = aws_cognito_user_pool.this.id
 
   explicit_auth_flows           = ["ALLOW_USER_PASSWORD_AUTH"]
@@ -41,19 +41,7 @@ resource "aws_cognito_user_pool_client" "this" {
 }
 
 resource "aws_cognito_user_pool_domain" "this" {
-  domain       = "${local.repo}-auth"
+  domain       = "${local.resource_prefix}-auth"
   user_pool_id = aws_cognito_user_pool.this.id
 }
 
-output "cognito_user_pool_id" {
-  value = aws_cognito_user_pool.this.id
-}
-output "cognito_client_id" {
-  value = aws_cognito_user_pool_client.this.id
-}
-output "cognito_domain" {
-  value = "${aws_cognito_user_pool_domain.this.domain}.auth.${data.aws_region.current.name}.amazoncognito.com"
-}
-output "cognito_region" {
-  value = data.aws_region.current.name
-}

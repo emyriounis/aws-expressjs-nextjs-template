@@ -14,7 +14,7 @@ variable "base_domain" {
 
 variable "runtime" {
   type    = string
-  default = "nodejs18.x"
+  default = "nodejs24.x"
 }
 
 variable "logs_retention" {

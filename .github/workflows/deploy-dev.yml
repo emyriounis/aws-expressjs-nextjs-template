@@ -68,31 +68,11 @@ jobs:
             expressjs/layer.zip
             expressjs/source.zip
 
-  build-reactjs:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: 'npm'
-          cache-dependency-path: reactjs/package-lock.json
-      - run: |
-          cd reactjs
-          npm ci
-          CI=false npm run build
-      - uses: actions/upload-artifact@v6
-        with:
-          name: reactjs-artifacts
-          path: reactjs/build
-
-  deploy-dev:
+  deploy-dev-expressjs:
     needs:
       - test-expressjs
-      - test-reactjs
-      - test-terraform
       - build-expressjs
-      - build-reactjs
+      - test-terraform
     runs-on: ubuntu-24.04
     environment: dev
     steps:
@@ -110,6 +90,85 @@ jobs:
           name: expressjs-artifacts
           path: expressjs
 
+      - name: Deploy
+        working-directory: expressjs/terraform
+        env:
+          TF_WORKSPACE: dev
+        run: |
+          terraform init
+          terraform apply -auto-approve -var-file=config/dev.tfvars
+
+  fetch-reactjs-config:
+    needs:
+      - deploy-dev-expressjs
+    runs-on: ubuntu-24.04
+    environment: dev
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.11.1
+
+      - name: Fetch ReactJS Config
+        working-directory: scripts
+        env:
+          TF_WORKSPACE: dev
+        run: |
+          terraform init
+          terraform apply -auto-approve -var-file=../reactjs/terraform/config/dev.tfvars
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: reactjs-env-artifact
+          path: scripts/reactjs.env
+
+  build-reactjs:
+    needs:
+      - test-reactjs
+      - fetch-reactjs-config
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: reactjs/package-lock.json
+
+      - name: Download Config Artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: reactjs-env-artifact
+          path: scripts
+
+      - run: |
+          cd reactjs
+          npm ci
+          cp ../scripts/reactjs.env .env
+          CI=false npm run build
+      - uses: actions/upload-artifact@v6
+        with:
+          name: reactjs-artifacts
+          path: reactjs/build
+
+  deploy-dev-reactjs:
+    needs:
+      - build-reactjs
+    runs-on: ubuntu-24.04
+    environment: dev
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.11.1
+
       - name: Download Artifacts - reactjs
         uses: actions/download-artifact@v7
         with:
@@ -117,9 +176,9 @@ jobs:
           path: reactjs/build
 
       - name: Deploy
+        working-directory: reactjs/terraform
         env:
           TF_WORKSPACE: dev
         run: |
-          cd terraform
           terraform init
           terraform apply -auto-approve -var-file=config/dev.tfvars

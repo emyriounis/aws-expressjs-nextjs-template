@@ -16,10 +16,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "myriounis-terraform-state"
-    key     = "aws-expressjs-nextjs-template/terraform.tfstate"
-    region  = "eu-central-1"
-    encrypt = true
+    bucket       = "myriounis-terraform-state"
+    key          = "aws-expressjs-nextjs-template/expressjs.tfstate"
+    region       = "eu-central-1"
+    encrypt      = true
+    use_lockfile = true
   }
 }
 
