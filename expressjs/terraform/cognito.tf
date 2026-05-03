@@ -14,13 +14,22 @@ resource "aws_cognito_user_pool" "this" {
   admin_create_user_config {
     allow_admin_create_user_only = true
   }
+
+  password_policy {
+    minimum_length                   = 8
+    require_lowercase                = true
+    require_numbers                  = true
+    require_symbols                  = false
+    require_uppercase                = true
+    temporary_password_validity_days = 7
+  }
 }
 
 resource "aws_cognito_user_pool_client" "this" {
   name         = "${local.resource_prefix}-client"
   user_pool_id = aws_cognito_user_pool.this.id
 
-  explicit_auth_flows           = ["ALLOW_USER_PASSWORD_AUTH", "ALLOW_USER_SRP_AUTH"]
+  explicit_auth_flows           = ["ALLOW_USER_SRP_AUTH"]
   prevent_user_existence_errors = "ENABLED"
 
   access_token_validity  = 8   #hours
