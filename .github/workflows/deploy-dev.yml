@@ -44,7 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Run Trivy IaC Scanner
-        run: trivy config terraform --severity CRITICAL --exit-code 1
+        run: trivy config . --severity CRITICAL --exit-code 1
 
   build-expressjs:
     runs-on: ubuntu-24.04
