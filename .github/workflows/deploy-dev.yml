@@ -23,28 +23,14 @@ jobs:
           npm ci
           npm run test
 
-  test-reactjs:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: 'npm'
-          cache-dependency-path: reactjs/package-lock.json
-      - run: |
-          cd reactjs
-          npm ci
-          npm run test
-
-  test-terraform:
+  test-expressjs-terraform:
     container:
       image: aquasec/trivy@sha256:be1190afcb28352bfddc4ddeb71470835d16462af68d310f9f4bca710961a41e # v0.70
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
       - name: Run Trivy IaC Scanner
-        run: trivy config . --severity CRITICAL --exit-code 1
+        run: trivy config expressjs/terraform --severity CRITICAL --exit-code 1
 
   build-expressjs:
     runs-on: ubuntu-24.04
@@ -72,7 +58,7 @@ jobs:
     needs:
       - test-expressjs
       - build-expressjs
-      - test-terraform
+      - test-expressjs-terraform
     runs-on: ubuntu-24.04
     environment: dev
     steps:
@@ -126,9 +112,35 @@ jobs:
           name: reactjs-env-artifact
           path: scripts/reactjs.env
 
+  test-reactjs-terraform:
+    needs:
+      - fetch-reactjs-config
+    container:
+      image: aquasec/trivy@sha256:be1190afcb28352bfddc4ddeb71470835d16462af68d310f9f4bca710961a41e # v0.70
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run Trivy IaC Scanner
+        run: trivy config reactjs/terraform --severity CRITICAL --exit-code 1
+
+  test-reactjs:
+    needs:
+      - fetch-reactjs-config
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: reactjs/package-lock.json
+      - run: |
+          cd reactjs
+          npm ci
+          npm run test
+
   build-reactjs:
     needs:
-      - test-reactjs
       - fetch-reactjs-config
     runs-on: ubuntu-24.04
     steps:
@@ -157,6 +169,8 @@ jobs:
 
   deploy-dev-reactjs:
     needs:
+      - test-reactjs-terraform
+      - test-reactjs
       - build-reactjs
     runs-on: ubuntu-24.04
     environment: dev

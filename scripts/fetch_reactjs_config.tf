@@ -25,7 +25,8 @@ terraform {
 }
 
 data "terraform_remote_state" "expressjs" {
-  backend = "s3"
+  backend   = "s3"
+  workspace = terraform.workspace
   config = {
     bucket = "myriounis-terraform-state"
     key    = "aws-expressjs-nextjs-template/expressjs.tfstate"
