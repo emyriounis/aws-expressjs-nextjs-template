@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { Amplify } from 'aws-amplify';
 import { I18n } from 'aws-amplify/utils';
 import { translations } from '@aws-amplify/ui-react';
+import { env } from './utils/env';
 
 // Load all default translations provided by Amplify
 I18n.putVocabularies(translations);
@@ -38,14 +39,14 @@ I18n.setLanguage('el');
 Amplify.configure({
   Auth: {
     Cognito: {
-      userPoolId: process.env.REACT_APP_COGNITO_USER_POOL_ID!,
-      userPoolClientId: process.env.REACT_APP_COGNITO_CLIENT_ID!,
+      userPoolId: env.COGNITO_USER_POOL_ID,
+      userPoolClientId: env.COGNITO_CLIENT_ID,
       loginWith: {
         oauth: {
-          domain: process.env.REACT_APP_COGNITO_DOMAIN!,
+          domain: env.COGNITO_DOMAIN,
           scopes: ['openid', 'email', 'profile'],
-          redirectSignIn: JSON.parse(process.env.REACT_APP_COGNITO_REDIRECT_SIGNIN!),
-          redirectSignOut: JSON.parse(process.env.REACT_APP_COGNITO_REDIRECT_SIGNOUT!),
+          redirectSignIn: env.COGNITO_REDIRECT_SIGNIN,
+          redirectSignOut: env.COGNITO_REDIRECT_SIGNOUT,
           responseType: 'code',
         },
       },

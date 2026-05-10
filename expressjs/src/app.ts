@@ -11,7 +11,7 @@ app.use(express.json())
 app.use('/', routes)
 app.use('*', (_req, res) => res.sendStatus(404))
 
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   console.error(`Error handler caught: `, err)
   return res.sendStatus(500)
 })

@@ -161,7 +161,7 @@ jobs:
           cd reactjs
           npm ci
           cp ../scripts/reactjs.env .env
-          CI=false npm run build
+          npm run build
       - uses: actions/upload-artifact@v6
         with:
           name: reactjs-artifacts
