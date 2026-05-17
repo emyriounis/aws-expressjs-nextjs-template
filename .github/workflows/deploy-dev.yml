@@ -136,6 +136,7 @@ jobs:
           cache-dependency-path: reactjs/package-lock.json
       - run: |
           cd reactjs
+          cp .env.test .env
           npm ci
           npm run test
 
@@ -159,8 +160,8 @@ jobs:
 
       - run: |
           cd reactjs
-          npm ci
           cp ../scripts/reactjs.env .env
+          npm ci
           npm run build
       - uses: actions/upload-artifact@v6
         with:
