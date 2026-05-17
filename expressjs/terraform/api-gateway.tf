@@ -71,6 +71,15 @@ module "api_gateway" {
       }
     }
 
+    "OPTIONS /{proxy+}" = {
+      authorization_type = "NONE"
+
+      integration = {
+        uri                    = module.lambda.lambda_function_arn
+        payload_format_version = "2.0"
+      }
+    }
+
     "$default" = {
       authorization_type = "JWT"
       authorizer_key     = "cognito"
