@@ -15,7 +15,7 @@ describe('example', () => {
     const text = screen.getByText(/Hello testuser/i)
     expect(text).toBeInTheDocument()
 
-    const reactLink = screen.getByText(/Learn React/i)
-    expect(reactLink).toBeInTheDocument()
+    const signOutBtn = screen.getByText(/Sign out/i)
+    expect(signOutBtn).toBeInTheDocument()
   })
 })

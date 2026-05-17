@@ -8,6 +8,7 @@ const config = {
   },
   // modulePathIgnorePatterns: [],
   preset: 'ts-jest',
+  setupFiles: ['dotenv/config'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   transform: { '^.+\\.(ts|tsx)?$': 'ts-jest' },
