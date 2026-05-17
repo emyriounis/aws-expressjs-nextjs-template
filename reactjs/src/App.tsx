@@ -16,7 +16,7 @@ const MainContent = ({ user, signOut }: { user: any; signOut: any }) => {
           const idToken = tokens?.idToken?.toString();
 
           if (!env.API_URL) {
-            setApiResponse('REACT_APP_API_URL is missing in environment variables (.env)');
+            setApiResponse('REACT_APP_EXPRESSJS_DOMAIN is missing in environment variables (.env)');
             return;
           }
 
