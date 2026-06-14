@@ -23,15 +23,42 @@ export const handler = async (event: any) => {
     // We use the direct path to the Prisma CLI in the Lambda Layer (/opt)
     // to prevent npx from trying to download it from the internet (which fails in a private VPC).
     const prismaCli = '/opt/nodejs/node_modules/prisma/build/index.js';
-    const output = execSync(`node ${prismaCli} migrate deploy --schema=${schemaPath}`, {
-      env: {
-        ...process.env,
-        // Ensure Prisma doesn't try to format output with colors which can mess up CloudWatch
-        NO_COLOR: '1',
-      },
-      encoding: 'utf-8',
-      stdio: 'pipe',
-    });
+    
+    const maxRetries = 5;
+    const retryDelayMs = 10000;
+    let attempts = 0;
+    let output = '';
+    let success = false;
+
+    while (attempts < maxRetries && !success) {
+      try {
+        attempts++;
+        console.log(`Running migration attempt ${attempts} of ${maxRetries}...`);
+        
+        output = execSync(`node ${prismaCli} migrate deploy --schema=${schemaPath}`, {
+          env: {
+            ...process.env,
+            // Ensure Prisma doesn't try to format output with colors which can mess up CloudWatch
+            NO_COLOR: '1',
+          },
+          encoding: 'utf-8',
+          stdio: 'pipe',
+        });
+        
+        success = true;
+      } catch (error: any) {
+        console.error(`Attempt ${attempts} failed:`, error.message);
+        if (error.stdout) console.error('STDOUT:', error.stdout);
+        if (error.stderr) console.error('STDERR:', error.stderr);
+
+        if (attempts < maxRetries) {
+          console.log(`Waiting ${retryDelayMs / 1000} seconds before retrying...`);
+          await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        } else {
+          throw error;
+        }
+      }
+    }
 
     console.log('Migration successful!');
     console.log(output);
@@ -42,16 +69,12 @@ export const handler = async (event: any) => {
     };
   } catch (error: any) {
     console.error('Migration failed:', error.message);
-    if (error.stdout) console.error('STDOUT:', error.stdout);
-    if (error.stderr) console.error('STDERR:', error.stderr);
 
     return {
       statusCode: 500,
       body: JSON.stringify({
         message: 'Migration failed',
         error: error.message,
-        stdout: error.stdout,
-        stderr: error.stderr,
       }),
     };
   }
