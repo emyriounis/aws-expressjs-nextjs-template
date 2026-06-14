@@ -30,7 +30,7 @@ jobs:
       - run: |
           cd expressjs
           npm ci
-          npm run test:ci
+          npm run test
 
   test-expressjs-terraform:
     container:
