@@ -68,7 +68,7 @@ resource "local_file" "reactjs_env" {
 REACT_APP_COGNITO_USER_POOL_ID=${data.terraform_remote_state.expressjs.outputs.cognito_user_pool_id}
 REACT_APP_COGNITO_CLIENT_ID=${data.terraform_remote_state.expressjs.outputs.cognito_client_id}
 REACT_APP_COGNITO_DOMAIN=${data.terraform_remote_state.expressjs.outputs.cognito_domain}
-REACT_APP_EXPRESSJS_DOMAIN=${data.terraform_remote_state.expressjs.outputs.expressjs_domain}
+REACT_APP_EXPRESSJS_DOMAIN=https://${data.terraform_remote_state.expressjs.outputs.expressjs_domain}
 REACT_APP_COGNITO_REDIRECT_SIGNIN=["http://localhost:3000", "https://${local.reactjs_domain}"]
 REACT_APP_COGNITO_REDIRECT_SIGNOUT=["http://localhost:3000", "https://${local.reactjs_domain}"]
 EOT
