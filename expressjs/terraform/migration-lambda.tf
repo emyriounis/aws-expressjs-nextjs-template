@@ -37,6 +37,6 @@ resource "null_resource" "trigger_migration" {
   }
 
   provisioner "local-exec" {
-    command = "aws lambda invoke --function-name ${module.migration_lambda.lambda_function_name} --invocation-type RequestResponse response.json && cat response.json"
+    command = "aws lambda invoke --function-name ${module.migration_lambda.lambda_function_name} --invocation-type --region ${data.aws_region.current.name} RequestResponse response.json && cat response.json"
   }
 }

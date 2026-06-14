@@ -5,11 +5,13 @@ resource "random_password" "db_password" {
 }
 
 resource "aws_secretsmanager_secret" "db_credentials" {
-  name = "${local.resource_prefix}-db-credentials"
+  name_prefix = "${local.resource_prefix}-db-credentials"
+
+  recovery_window_in_days = 30
 }
 
 resource "aws_secretsmanager_secret_version" "db_credentials_version" {
-  secret_id     = aws_secretsmanager_secret.db_credentials.id
+  secret_id = aws_secretsmanager_secret.db_credentials.id
   secret_string = jsonencode({
     username = "postgres"
     password = random_password.db_password.result
