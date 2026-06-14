@@ -31,10 +31,9 @@ rm -rf nodejs/node_modules/@prisma/engines/*darwin*
 rm -rf nodejs/node_modules/prisma/*darwin*
 rm -rf nodejs/node_modules/.prisma/client/*darwin*
 
-# Remove native query engine binaries to save size (the Data API adapter uses WASM/JS engine in production)
-rm -rf nodejs/node_modules/@prisma/engines/libquery_engine*
+# Remove native query engine binaries from the prisma CLI and @prisma/engines package folders to save duplicate space
 rm -rf nodejs/node_modules/prisma/libquery_engine*
-rm -rf nodejs/node_modules/.prisma/client/libquery_engine*
+rm -rf nodejs/node_modules/@prisma/engines/libquery_engine*
 
 # Remove peerOptional typescript package to save 23MB
 rm -rf nodejs/node_modules/typescript
