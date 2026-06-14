@@ -1,19 +1,19 @@
-import express, { NextFunction, Request, Response } from 'express'
-import 'dotenv/config'
-import cors from 'cors'
-import routes from './routes/routes'
+import express, { NextFunction, Request, Response } from 'express';
+import 'dotenv/config';
+import cors from 'cors';
+import routes from './routes/routes';
 
-const app = express()
+const app = express();
 
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 
-app.use('/', routes)
-app.use('*', (_req, res) => res.sendStatus(404))
+app.use('/', routes);
+app.use('*', (_req, res) => res.sendStatus(404));
 
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(`Error handler caught: `, err)
-  return res.sendStatus(500)
-})
+  console.error(`Error handler caught: `, err);
+  return res.sendStatus(500);
+});
 
-export default app
+export default app;

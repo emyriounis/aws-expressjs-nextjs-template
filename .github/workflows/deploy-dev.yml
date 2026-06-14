@@ -11,6 +11,15 @@ env:
 jobs:
   test-expressjs:
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: express_db
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -21,7 +30,7 @@ jobs:
       - run: |
           cd expressjs
           npm ci
-          npm run test
+          npm run test:ci
 
   test-expressjs-terraform:
     container:

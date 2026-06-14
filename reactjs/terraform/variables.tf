@@ -3,7 +3,7 @@ variable "name" {
   default = "fs-template"
 }
 
-variable "enviroment" {
+variable "environment" {
   type = string
 }
 

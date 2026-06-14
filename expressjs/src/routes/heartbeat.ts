@@ -1,21 +1,21 @@
-import { Router } from 'express'
+import { Router } from 'express';
 
-const router = Router()
+const router = Router();
 
 router.get('/', async (_req, res, next) => {
   try {
-    return res.json({ data: new Date() })
+    return res.json({ data: new Date() });
   } catch (error) {
-    return next(error)
+    return next(error);
   }
-})
+});
 
 router.post('/', async (req, res, next) => {
   try {
-    return res.json({ data: req.body })
+    return res.json({ data: req.body });
   } catch (error) {
-    return next(error)
+    return next(error);
   }
-})
+});
 
-export default router
+export default router;

@@ -5,7 +5,7 @@ resource "aws_cognito_user_pool" "this" {
   user_pool_tier = "ESSENTIALS"
 
   alias_attributes    = ["email", "phone_number"]
-  deletion_protection = var.enviroment == "prod" ? "ENABLED" : "INACTIVE"
+  deletion_protection = var.environment == "prod" ? "ENABLED" : "INACTIVE"
 
   username_configuration {
     case_sensitive = true

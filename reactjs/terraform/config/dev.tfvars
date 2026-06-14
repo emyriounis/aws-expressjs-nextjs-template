@@ -1,2 +1,2 @@
-enviroment  = "dev"
+environment  = "dev"
 base_domain = "myriounis.com"

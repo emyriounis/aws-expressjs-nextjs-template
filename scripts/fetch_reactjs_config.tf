@@ -39,7 +39,7 @@ variable "name" {
   default = "fs-template"
 }
 
-variable "enviroment" {
+variable "environment" {
   type = string
 }
 
@@ -58,7 +58,7 @@ variable "global_region" {
 }
 
 locals {
-  env_prefix     = var.enviroment == "prod" ? "" : "${var.enviroment}."
+  env_prefix     = var.environment == "prod" ? "" : "${var.environment}."
   subdomain      = "${local.env_prefix}${var.name}.${var.base_domain}"
   reactjs_domain = "reactjs.${local.subdomain}"
 }

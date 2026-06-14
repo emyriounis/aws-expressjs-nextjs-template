@@ -11,9 +11,9 @@ output "cognito_client_id" {
 }
 
 output "cognito_domain" {
-  value = "${aws_cognito_user_pool_domain.this.domain}.auth.${data.aws_region.current.name}.amazoncognito.com"
+  value = "${aws_cognito_user_pool_domain.this.domain}.auth.${data.aws_region.current.id}.amazoncognito.com"
 }
 
 output "cognito_region" {
-  value = data.aws_region.current.name
+  value = data.aws_region.current.id
 }

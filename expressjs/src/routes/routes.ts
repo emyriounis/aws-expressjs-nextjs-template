@@ -1,10 +1,10 @@
-import { Router } from 'express'
-import heartbeatRouter from './heartbeat'
-import testAuthRouter from './test-auth'
+import { Router } from 'express';
+import heartbeatRouter from './heartbeat';
+import testAuthRouter from './test-auth';
 
-const router = Router()
+const router = Router();
 
-router.use('/heartbeat', heartbeatRouter)
-router.use('/test-auth', testAuthRouter)
+router.use('/heartbeat', heartbeatRouter);
+router.use('/test-auth', testAuthRouter);
 
-export default router
+export default router;

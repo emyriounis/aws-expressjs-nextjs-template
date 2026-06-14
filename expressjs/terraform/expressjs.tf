@@ -42,7 +42,11 @@ module "lambda" {
   }
 
   environment_variables = {
-    NODE_ENV = var.enviroment
+    NODE_ENV           = "prod"
+    ENV                = var.environment
+    AURORA_CLUSTER_ARN = aws_rds_cluster.aurora.arn
+    SECRET_ARN         = aws_secretsmanager_secret.db_credentials.arn
+    DATABASE_NAME      = aws_rds_cluster.aurora.database_name
   }
 
   allowed_triggers = {
@@ -53,12 +57,23 @@ module "lambda" {
     }
   }
 
-  # attach_policy_statements = true
-  # policy_statements = {
-  #   type = {
-  #     effect = "Allow",
-  #     actions = ["resource:action"],
-  #     resources = [""]
-  #   }
-  # }
+  attach_policy_statements = true
+  policy_statements = {
+    rds_data = {
+      effect = "Allow",
+      actions = [
+        "rds-data:BatchExecuteStatement",
+        "rds-data:BeginTransaction",
+        "rds-data:CommitTransaction",
+        "rds-data:ExecuteStatement",
+        "rds-data:RollbackTransaction"
+      ],
+      resources = [aws_rds_cluster.aurora.arn]
+    },
+    secrets = {
+      effect    = "Allow",
+      actions   = ["secretsmanager:GetSecretValue"],
+      resources = [aws_secretsmanager_secret.db_credentials.arn]
+    }
+  }
 }
