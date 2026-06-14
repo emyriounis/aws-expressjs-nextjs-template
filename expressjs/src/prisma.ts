@@ -32,7 +32,7 @@ try {
     console.log('Prisma Client with RDS Data API adapter successfully initialized.');
   } else {
     console.log('Initialization fallback: Using standard PrismaClient (TCP)...');
-    prisma = new PrismaClient();
+    prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
   }
 } catch (e) {
   console.error('Error during Prisma initialization:', e);

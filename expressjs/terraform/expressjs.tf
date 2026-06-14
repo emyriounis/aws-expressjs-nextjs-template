@@ -30,10 +30,9 @@ module "lambda" {
   cloudwatch_logs_retention_in_days = var.logs_retention
   # dead_letter_target_arn
 
-  attach_network_policy = false
-  # attach_network_policy  = true
-  # vpc_subnet_ids         = module.vpc.private_subnets
-  # vpc_security_group_ids = [module.vpc.default_security_group_id]
+  attach_network_policy  = true
+  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_security_group_ids = [aws_security_group.aurora_sg.id]
 
   cors = {
     allow_credentials = true
@@ -42,11 +41,12 @@ module "lambda" {
   }
 
   environment_variables = {
-    NODE_ENV           = "prod"
-    ENV                = var.environment
-    AURORA_CLUSTER_ARN = aws_rds_cluster.aurora.arn
-    SECRET_ARN         = aws_secretsmanager_secret.db_credentials.arn
-    DATABASE_NAME      = aws_rds_cluster.aurora.database_name
+    NODE_ENV = "prod"
+    ENV      = var.environment
+    # AURORA_CLUSTER_ARN = aws_rds_cluster.aurora.arn
+    # SECRET_ARN         = aws_secretsmanager_secret.db_credentials.arn
+    # DATABASE_NAME      = aws_rds_cluster.aurora.database_name
+    DATABASE_URL = "postgresql://${aws_rds_cluster.aurora.master_username}:${random_password.db_password.result}@${aws_rds_cluster.aurora.endpoint}:${aws_rds_cluster.aurora.port}/${aws_rds_cluster.aurora.database_name}"
   }
 
   allowed_triggers = {

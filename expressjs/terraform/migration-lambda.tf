@@ -8,7 +8,7 @@ module "migration_lambda" {
   runtime                      = var.runtime
   memory_size                  = var.lambda_memory_size
   ephemeral_storage_size       = 512
-  timeout                      = 300
+  timeout                      = 30
   maximum_event_age_in_seconds = 60
   maximum_retry_attempts       = 0
 
