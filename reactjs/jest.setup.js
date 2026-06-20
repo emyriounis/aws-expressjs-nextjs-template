@@ -1,4 +1,4 @@
-require('@testing-library/jest-dom')
+require('@testing-library/jest-dom');
 // const { configure } = require('@testing-library/dom')
 // const fetch = require('node-fetch')
 // globalThis.fetch = fetch

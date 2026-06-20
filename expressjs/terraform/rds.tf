@@ -10,13 +10,21 @@ resource "aws_security_group" "aurora_sg" {
     protocol    = "tcp"
     cidr_blocks = [module.vpc.vpc_cidr_block]
   }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_rds_cluster" "aurora" {
   cluster_identifier = "${local.resource_prefix}-aurora-cluster"
   engine             = "aurora-postgresql"
   engine_mode        = "provisioned"
-  engine_version     = "16.4"
+  engine_version     = "18.3"
   database_name      = "fs_template_db"
   master_username    = "postgres"
   master_password    = random_password.db_password.result
@@ -29,7 +37,7 @@ resource "aws_rds_cluster" "aurora" {
   skip_final_snapshot  = true
 
   serverlessv2_scaling_configuration {
-    max_capacity             = 1.0
+    max_capacity             = 2.0
     min_capacity             = 0.0
     seconds_until_auto_pause = 300
   }

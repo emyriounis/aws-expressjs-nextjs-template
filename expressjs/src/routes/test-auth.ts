@@ -1,11 +1,13 @@
 import { getCurrentInvoke } from '@vendia/serverless-express';
 import { Router } from 'express';
 import prisma from '../prisma';
+import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
 
-router.get('/', async (_req, res, next) => {
-  try {
+router.get(
+  '/',
+  asyncHandler(async (_req, res) => {
     const { event } = getCurrentInvoke();
     const claims = event?.requestContext?.authorizer?.jwt?.claims || {};
     const userId = claims.sub;
@@ -33,10 +35,7 @@ router.get('/', async (_req, res, next) => {
       message: `Hello, ${user.email}! Welcome to your Aurora database.`,
       user,
     });
-  } catch (error) {
-    console.error('Error in test-auth:', error);
-    return next(error);
-  }
-});
+  }),
+);
 
 export default router;

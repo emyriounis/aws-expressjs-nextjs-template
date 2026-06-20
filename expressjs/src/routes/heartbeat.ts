@@ -1,21 +1,20 @@
 import { Router } from 'express';
+import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
 
-router.get('/', async (_req, res, next) => {
-  try {
+router.get(
+  '/',
+  asyncHandler(async (_req, res) => {
     return res.json({ data: new Date() });
-  } catch (error) {
-    return next(error);
-  }
-});
+  }),
+);
 
-router.post('/', async (req, res, next) => {
-  try {
+router.post(
+  '/',
+  asyncHandler(async (req, res) => {
     return res.json({ data: req.body });
-  } catch (error) {
-    return next(error);
-  }
-});
+  }),
+);
 
 export default router;

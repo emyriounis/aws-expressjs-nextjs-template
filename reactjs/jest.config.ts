@@ -12,6 +12,6 @@ const config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   transform: { '^.+\\.(ts|tsx)?$': 'ts-jest' },
-}
+};
 
-export default config
+export default config;

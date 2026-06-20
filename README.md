@@ -3,6 +3,7 @@
 This monorepo contains three main components: an ExpressJS expressjs server (`expressjs/`), a Next.js nextjs website (`nextjs/`), and Terraform configurations (`terraform/`) to deploy the entire application stack on AWS. This repository is organized to streamline development, deployment, and maintenance processes.
 
 ## Table of Contents
+
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [Folder Structure](#folder-structure)
@@ -15,12 +16,15 @@ This monorepo contains three main components: an ExpressJS expressjs server (`ex
 - [License](#license) -->
 
 ## Prerequisites
+
 Before you begin, ensure you have the following installed:
+
 - Node.js and npm (for both expressjs and nextjs)
 - Terraform (for deployment)
 - AWS CLI configured with appropriate credentials
 
 ## Getting Started
+
 1. Clone this repository: `git clone https://github.com/emyriounis/aws-expressjs-nextjs-template.git`
 2. Navigate to the repository root: `cd aws-expressjs-nextjs-template`
 3. Install dependencies for expressjs: `cd expressjs && npm install`
@@ -30,20 +34,27 @@ Before you begin, ensure you have the following installed:
 ## Folder Structure
 
 ## ExpressJS
+
 The `expressjs/` folder contains the ExpressJS server. To start the expressjs locally:
+
 1. Navigate to the expressjs folder: `cd expressjs`
 2. Run: `npm run dev`
 
 ## NextJS
+
 The `nextjs/` folder contains the Next.js website. To start the nextjs locally:
+
 1. Navigate to the nextjs folder: `cd nextjs`
 2. Run: `npm run dev`
 
 ## Terraform
+
 The `terraform/` folder contains Terraform configurations for deploying the application stack on AWS. Customize the configurations in this folder according to your AWS environment.
 
 ## Deployment
+
 To deploy the entire application stack on AWS:
+
 1. Navigate to the `terraform/` folder: `cd terraform`
 2. Initialize Terraform: `terraform init`
 3. Review and modify the `main.tf` and other configuration files as needed.
@@ -51,12 +62,14 @@ To deploy the entire application stack on AWS:
 5. Visualize the infrastructure: `terraform graph -type=plan | dot -Tpng > graph.png`
 
 ## Known Issues
+
 A list of known issues:
+
 1. Subdomain has a limit on ammount of characters
 2. NextJS v12 is required for `milliHQ/next-js/aws` tf module to work
 3. Tarraform v4 is required for `milliHQ/next-js/aws` tf module to work
 4. S3 buckets: `Permissions > Object Ownership > ACLs enabled` required for `milliHQ/next-js/aws` tf module to work
-5. `terraform-aws-modules/vpc/aws` v4 is required 
+5. `terraform-aws-modules/vpc/aws` v4 is required
 
 <!-- ## Contributing
 We welcome contributions! To contribute to this repository:

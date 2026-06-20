@@ -1,7 +1,10 @@
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import path from 'path';
 
-export const handler = async (event: any) => {
+const execAsync = promisify(exec);
+
+export const handler = async (_event: unknown) => {
   console.log('Starting Prisma Migration...');
 
   try {
@@ -23,7 +26,7 @@ export const handler = async (event: any) => {
     // We use the direct path to the Prisma CLI in the Lambda Layer (/opt)
     // to prevent npx from trying to download it from the internet (which fails in a private VPC).
     const prismaCli = '/opt/nodejs/node_modules/prisma/build/index.js';
-    
+
     const maxRetries = 5;
     const retryDelayMs = 10000;
     let attempts = 0;
@@ -34,22 +37,27 @@ export const handler = async (event: any) => {
       try {
         attempts++;
         console.log(`Running migration attempt ${attempts} of ${maxRetries}...`);
-        
-        output = execSync(`node ${prismaCli} migrate deploy --schema=${schemaPath}`, {
-          env: {
-            ...process.env,
-            // Ensure Prisma doesn't try to format output with colors which can mess up CloudWatch
-            NO_COLOR: '1',
+
+        const { stdout } = await execAsync(
+          `node ${prismaCli} migrate deploy --schema=${schemaPath}`,
+          {
+            env: {
+              ...process.env,
+              // Ensure Prisma doesn't try to format output with colors which can mess up CloudWatch
+              NO_COLOR: '1',
+            },
           },
-          encoding: 'utf-8',
-          stdio: 'pipe',
-        });
-        
+        );
+
+        output = stdout;
         success = true;
-      } catch (error: any) {
-        console.error(`Attempt ${attempts} failed:`, error.message);
-        if (error.stdout) console.error('STDOUT:', error.stdout);
-        if (error.stderr) console.error('STDERR:', error.stderr);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error(`Attempt ${attempts} failed:`, error.message);
+          const execError = error as Error & { stdout?: string; stderr?: string };
+          if (execError.stdout) console.error('STDOUT:', execError.stdout);
+          if (execError.stderr) console.error('STDERR:', execError.stderr);
+        }
 
         if (attempts < maxRetries) {
           console.log(`Waiting ${retryDelayMs / 1000} seconds before retrying...`);
@@ -67,14 +75,15 @@ export const handler = async (event: any) => {
       statusCode: 200,
       body: JSON.stringify({ message: 'Migration completed successfully', output }),
     };
-  } catch (error: any) {
-    console.error('Migration failed:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Migration failed:', message);
 
     return {
       statusCode: 500,
       body: JSON.stringify({
         message: 'Migration failed',
-        error: error.message,
+        error: message,
       }),
     };
   }
