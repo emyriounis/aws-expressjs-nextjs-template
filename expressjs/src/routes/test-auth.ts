@@ -1,12 +1,23 @@
 import { getCurrentInvoke } from '@vendia/serverless-express';
 import { Router } from 'express';
+import { z } from 'zod';
 import prisma from '../prisma';
 import { asyncHandler } from '../utils/asyncHandler';
+import { validate } from '../middleware/validate';
 
 const router = Router();
 
+const testAuthSchema = {
+  response: z.object({
+    message: z.string(),
+    userId: z.string().optional(),
+    user: z.any().optional(),
+  }),
+};
+
 router.get(
   '/',
+  validate(testAuthSchema),
   asyncHandler(async (_req, res) => {
     const { event } = getCurrentInvoke();
     const claims = event?.requestContext?.authorizer?.jwt?.claims || {};

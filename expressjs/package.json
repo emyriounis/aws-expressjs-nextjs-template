@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon src/local-server.ts",
-    "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down",
+    "docker:up": "docker compose up -d --wait",
+    "docker:down": "docker compose down -v",
     "db:setup": "cp .env.test .env && prisma migrate deploy",
     "test": "jest --runInBand --forceExit --detectOpenHandles",
     "test:local": "npm-run-all docker:down docker:up db:setup test",
@@ -23,7 +23,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "prisma": "^6.19.3"
+    "prisma": "^6.19.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@aws-sdk/client-rds-data": "^3.1048.0",
