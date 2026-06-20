@@ -25,9 +25,8 @@ resource "aws_rds_cluster" "aurora" {
   vpc_security_group_ids = [aws_security_group.aurora_sg.id]
 
   # Enable the RDS Data API
-  enable_http_endpoint        = true
-  skip_final_snapshot         = true
-  allow_major_version_upgrade = true
+  enable_http_endpoint = true
+  skip_final_snapshot  = true
 
   serverlessv2_scaling_configuration {
     max_capacity             = 2.0
