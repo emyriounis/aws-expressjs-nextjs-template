@@ -44,6 +44,7 @@ describe('GET /test-auth', () => {
         email: 'email',
         name: 'New User',
         createdAt: expect.any(String),
+        updatedAt: expect.any(String),
       },
     });
   });
