@@ -28,6 +28,7 @@ resource "aws_rds_cluster" "aurora" {
   enable_http_endpoint = true
   skip_final_snapshot  = true
   deletion_protection  = true
+  copy_tags_to_snapshot = true
 
   serverlessv2_scaling_configuration {
     max_capacity = var.environment == "prod" ? 8 : 2
