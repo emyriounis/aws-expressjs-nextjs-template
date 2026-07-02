@@ -35,7 +35,7 @@ router.get(
     // Upsert user into database
     const user = await prisma.user.upsert({
       where: { email },
-      update: {}, // Just fetch if exists
+      update: { name: 'Updated User' },
       create: {
         email,
         name: 'New User',
