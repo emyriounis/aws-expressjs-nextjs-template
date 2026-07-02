@@ -27,12 +27,36 @@ resource "aws_rds_cluster" "aurora" {
   # Enable the RDS Data API
   enable_http_endpoint = true
   skip_final_snapshot  = true
+  deletion_protection  = true
 
   serverlessv2_scaling_configuration {
-    max_capacity             = 2.0
-    min_capacity             = 0.0
+    max_capacity = var.environment == "prod" ? 8 : 2
+    min_capacity = 0
+    # min_capacity = var.environment == "prod" ? 0.5 : 0
     seconds_until_auto_pause = 300
   }
+}
+
+resource "aws_iam_role" "rds_monitoring" {
+  name = "${local.resource_prefix}-rds-monitoring-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "monitoring.rds.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "rds_monitoring" {
+  role       = aws_iam_role.rds_monitoring.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }
 
 resource "aws_rds_cluster_instance" "aurora_instance" {
@@ -41,4 +65,9 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   engine              = aws_rds_cluster.aurora.engine
   engine_version      = aws_rds_cluster.aurora.engine_version
   publicly_accessible = false
+
+  performance_insights_enabled = true
+
+  monitoring_interval = var.environment == "prod" ? 60 : 1
+  monitoring_role_arn = aws_iam_role.rds_monitoring.arn
 }
